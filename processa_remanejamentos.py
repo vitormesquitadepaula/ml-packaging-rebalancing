@@ -1,30 +1,30 @@
 # -*- coding: utf-8 -*-
 """
-Remanejamento de estruturas de embalagem com IA/ML
+Packaging structure rebalancing with AI/ML
 
-O que este script faz
-- Detecta outliers de comportamento (cobertura/consumo/estoque) via IsolationForest (scikit-learn)
-  * Recebedoras outliers: processadas por último (baixa prioridade)
-  * Doadores outliers: evitados; usados apenas como último recurso
-- Abate dinamicamente o estoque do doador a cada remanejamento
-- Garante que doadores preservem um "estoque mínimo" (por padrão: >= 60 dias de consumo)
-- Remessas em múltiplos de 5
-  * arredonda para cima
-  * fallback para o maior múltiplo de 5 possível (>= mínimo por embalagem)
-- Quando need < mínimo: tenta enviar o MÍNIMO (se houver capacidade mantendo estoque mínimo),
-  senão marca como NAO_ATENDIDA
-- Grava ATENDIDA, PARCIAL e NAO_ATENDIDA (esta última com doador nulo e quantidade=0)
-- Idempotência: remove previamente as linhas do DIA na tabela destino antes de inserir
+What this script does
+- Detects behavioral outliers (coverage/consumption/stock) using IsolationForest (scikit-learn)
+  * Outlier receivers: processed last (low priority)
+  * Outlier donors: avoided; used only as a last resort
+- Dynamically deducts donor stock after each transfer
+- Ensures donors preserve a "minimum stock" (default: >= 60 days of consumption)
+- Shipments in multiples of 5
+  * rounds up
+  * fallback to the largest possible multiple of 5 (>= minimum per packaging type)
+- When need < minimum: tries to ship the MINIMUM (if there is capacity while keeping minimum stock),
+  otherwise marks as NOT_SERVED
+- Writes SERVED, PARTIAL and NOT_SERVED (the latter with null donor and quantity=0)
+- Idempotency: deletes existing rows for TODAY from the target table before inserting
 
-⚠️ Segurança
-Este projeto NÃO deve ter credenciais hardcoded. Configure o banco via variáveis de ambiente:
-- Preferencialmente: DATABASE_URL (SQLAlchemy)
-- Alternativamente: PG_HOST, PG_PORT, PG_DB, PG_USER, PG_PASS
+⚠️ Security
+This project MUST NOT have hardcoded credentials. Configure the database via environment variables:
+- Preferred: DATABASE_URL (SQLAlchemy)
+- Alternative: PG_HOST, PG_PORT, PG_DB, PG_USER, PG_PASS
 
-Requisitos:
+Requirements:
   pip install -r requirements.txt
 
-Execução:
+Run:
   python processa_remanejamentos.py
   python processa_remanejamentos.py --dry-run
 """
